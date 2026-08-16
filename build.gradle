@@ -41,14 +41,14 @@ subprojects {
             }
         }
 
-        if (env.CODEARTIFACT_URL.isPresent()) {
+        if (env.isPresent('CODE_ARTIFACT_URL') && env.isPresent('CODE_ARTIFACT_TOKEN')) {
             repositories {
                 maven {
                     name = 'CodeArtifact'
-                    url = uri(env.CODEARTIFACT_URL.get())
+                    url = uri(env.fetch('CODE_ARTIFACT_URL'))
                     credentials {
                         username = 'aws'
-                        password = env.CODEARTIFACT_TOKEN.get()
+                        password = env.fetch('CODE_ARTIFACT_TOKEN')
                     }
                 }
             }

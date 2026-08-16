@@ -1,2 +1,3 @@
 rootProject.name = 'streamix-platform'
 
+include 'streamix-observability'

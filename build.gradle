@@ -18,6 +18,7 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'jacoco'
 
     java {
         toolchain {
@@ -37,5 +38,31 @@ subprojects {
                 from components.java
             }
         }
+    }
+
+    test {
+        useJUnitPlatform()
+
+        testLogging {
+            events 'passed', 'skipped', 'failed'
+        }
+
+        finalizedBy jacocoTestReport
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+            html.required = true
+        }
+    }
+
+    compileJava {
+        options.compilerArgs << '-Xlint:deprecation'
+    }
+
+    compileTestJava {
+        options.compilerArgs << '-Xlint:deprecation'
     }
 }

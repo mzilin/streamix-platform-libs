@@ -1,8 +1,23 @@
 dependencies {
+    // Spring Boot
     api 'org.springframework.boot:spring-boot-autoconfigure'
 
-    implementation 'org.springframework:spring-web'
-    implementation 'org.springframework:spring-webflux'
+    // Logging
+    api 'org.slf4j:slf4j-api'
 
+    // Nullability
+    compileOnly 'org.jspecify:jspecify'
+
+    // Servlet / MVC
+    compileOnly 'org.springframework:spring-web'
+    compileOnly 'org.springframework:spring-webmvc'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api'
+
+    // Reactive / WebFlux
+    compileOnly 'org.springframework:spring-webflux'
+    compileOnly 'io.projectreactor:reactor-core'
+
+    // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

@@ -40,13 +40,19 @@ subprojects {
         }
     }
 
+    compileJava {
+        options.compilerArgs << '-Xlint:deprecation'
+    }
+
+    compileTestJava {
+        options.compilerArgs << '-Xlint:deprecation'
+    }
+
     test {
         useJUnitPlatform()
-
         testLogging {
             events 'passed', 'skipped', 'failed'
         }
-
         finalizedBy jacocoTestReport
     }
 
@@ -56,13 +62,5 @@ subprojects {
             xml.required = true
             html.required = true
         }
-    }
-
-    compileJava {
-        options.compilerArgs << '-Xlint:deprecation'
-    }
-
-    compileTestJava {
-        options.compilerArgs << '-Xlint:deprecation'
     }
 }

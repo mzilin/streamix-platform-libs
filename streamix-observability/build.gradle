@@ -1,32 +1,19 @@
 dependencies {
-    // Spring Boot
-    api 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.slf4j:slf4j-api'
 
-    // Logging
-    api 'org.slf4j:slf4j-api'
-
-    // Nullability
     compileOnly 'org.jspecify:jspecify'
-
-    // Jakarta annotations (@PostConstruct) — provided at runtime by the consuming service
-    compileOnly 'jakarta.annotation:jakarta.annotation-api'
-
-    // Servlet / MVC
     compileOnly 'org.springframework:spring-web'
-    compileOnly 'org.springframework:spring-webmvc'
     compileOnly 'jakarta.servlet:jakarta.servlet-api'
+    compileOnly 'io.grpc:grpc-api'
+    compileOnly 'org.springframework.amqp:spring-rabbit'
+    compileOnly 'org.springframework.kafka:spring-kafka'
 
-    // Reactive / WebFlux
-    compileOnly 'org.springframework:spring-webflux'
-    compileOnly 'io.projectreactor:reactor-core'
-
-    // Context propagation — must be implementation so it is on consumers' runtime classpath
-    implementation 'io.micrometer:context-propagation'
-
-    // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework:spring-webflux'
-    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework:spring-webmvc'
     testImplementation 'jakarta.servlet:jakarta.servlet-api'
+    testImplementation 'io.grpc:grpc-api'
+    testImplementation 'org.springframework.amqp:spring-rabbit'
+    testImplementation 'org.springframework.kafka:spring-kafka'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

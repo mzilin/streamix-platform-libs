@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.UUID;
 
-public class StreamixLoggingFilter extends OncePerRequestFilter {
+public final class StreamixLoggingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(

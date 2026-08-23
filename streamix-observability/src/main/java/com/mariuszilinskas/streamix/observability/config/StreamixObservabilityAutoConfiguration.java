@@ -12,9 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 @AutoConfiguration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass(HttpServletRequest.class)
@@ -27,8 +24,7 @@ public class StreamixObservabilityAutoConfiguration {
         @Bean
         public StreamixLoggingFilter streamixLoggingFilter(Environment env) {
             String serviceName = env.getProperty("spring.application.name", "");
-            String environment = Arrays.stream(env.getActiveProfiles())
-                    .collect(Collectors.joining(","));
+            String environment = String.join(",", env.getActiveProfiles());
             return new StreamixLoggingFilter(serviceName, environment);
         }
 

@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.grpc;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -38,8 +38,8 @@ class StreamixGrpcClientInterceptorTest {
     @Test
     @SuppressWarnings("unchecked")
     void writesMdcCorrelationIdToOutgoingMetadata() {
-        MDC.put(LogContext.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
-        MDC.put(LogContext.USER_ID, "user-7");
+        MDC.put(ObservabilityUtils.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
+        MDC.put(ObservabilityUtils.USER_ID, "user-7");
         when(channel.newCall(any(), any())).thenReturn(clientCall);
 
         MethodDescriptor<Object, Object> method = mock(MethodDescriptor.class);

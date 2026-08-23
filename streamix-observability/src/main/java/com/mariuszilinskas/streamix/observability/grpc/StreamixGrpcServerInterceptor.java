@@ -1,7 +1,6 @@
 package com.mariuszilinskas.streamix.observability.grpc;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
-import com.mariuszilinskas.streamix.observability.util.LogContextManager;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import io.grpc.ForwardingServerCall;
 import io.grpc.ForwardingServerCallListener;
 import io.grpc.Metadata;
@@ -16,10 +15,10 @@ import java.util.Map;
 public final class StreamixGrpcServerInterceptor implements ServerInterceptor {
 
     static final Metadata.Key<String> CORRELATION_ID_KEY =
-            Metadata.Key.of(LogContext.CORRELATION_HEADER, Metadata.ASCII_STRING_MARSHALLER);
+            Metadata.Key.of(ObservabilityUtils.CORRELATION_HEADER, Metadata.ASCII_STRING_MARSHALLER);
 
     static final Metadata.Key<String> USER_ID_KEY =
-            Metadata.Key.of(LogContext.USER_ID_HEADER, Metadata.ASCII_STRING_MARSHALLER);
+            Metadata.Key.of(ObservabilityUtils.USER_ID_HEADER, Metadata.ASCII_STRING_MARSHALLER);
 
     private final String serviceName;
     private final String environment;
@@ -35,14 +34,14 @@ public final class StreamixGrpcServerInterceptor implements ServerInterceptor {
             Metadata inboundHeaders,
             ServerCallHandler<ReqT, RespT> next
     ) {
-        String correlationId = LogContextManager.resolveCorrelationId(inboundHeaders.get(CORRELATION_ID_KEY));
+        String correlationId = ObservabilityUtils.resolveCorrelationId(inboundHeaders.get(CORRELATION_ID_KEY));
         String userId = inboundHeaders.get(USER_ID_KEY);
 
         Map<String, String> previousContext = MDC.getCopyOfContextMap();
-        LogContextManager.put(LogContext.CORRELATION_ID, correlationId);
-        LogContextManager.put(LogContext.USER_ID, userId);
-        LogContextManager.put(LogContext.SERVICE, serviceName);
-        LogContextManager.put(LogContext.ENVIRONMENT, environment);
+        ObservabilityUtils.put(ObservabilityUtils.CORRELATION_ID, correlationId);
+        ObservabilityUtils.put(ObservabilityUtils.USER_ID, userId);
+        ObservabilityUtils.put(ObservabilityUtils.SERVICE, serviceName);
+        ObservabilityUtils.put(ObservabilityUtils.ENVIRONMENT, environment);
 
         ServerCall<ReqT, RespT> wrappedCall = new ForwardingServerCall.SimpleForwardingServerCall<>(call) {
             @Override

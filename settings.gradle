@@ -1,3 +1,4 @@
 rootProject.name = 'streamix-platform'
 
 include 'streamix-observability'
+include 'streamix-web-commons'

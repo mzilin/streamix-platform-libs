@@ -1,7 +1,6 @@
 package com.mariuszilinskas.streamix.observability.rabbit;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
-import com.mariuszilinskas.streamix.observability.util.LogContextManager;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jspecify.annotations.NonNull;
@@ -30,21 +29,21 @@ public final class StreamixRabbitConsumerInterceptor implements MethodIntercepto
 
         if (message != null) {
             Map<String, Object> headers = message.getMessageProperties().getHeaders();
-            correlationId = LogContextManager.resolveCorrelationId(
-                    headerAsString(headers.get(LogContext.CORRELATION_HEADER))
+            correlationId = ObservabilityUtils.resolveCorrelationId(
+                    headerAsString(headers.get(ObservabilityUtils.CORRELATION_HEADER))
             );
-            userId = headerAsString(headers.get(LogContext.USER_ID_HEADER));
+            userId = headerAsString(headers.get(ObservabilityUtils.USER_ID_HEADER));
         } else {
-            correlationId = LogContextManager.resolveCorrelationId(null);
+            correlationId = ObservabilityUtils.resolveCorrelationId(null);
         }
 
         Map<String, String> previousContext = MDC.getCopyOfContextMap();
 
         try {
-            LogContextManager.put(LogContext.CORRELATION_ID, correlationId);
-            LogContextManager.put(LogContext.USER_ID, userId);
-            LogContextManager.put(LogContext.SERVICE, serviceName);
-            LogContextManager.put(LogContext.ENVIRONMENT, environment);
+            ObservabilityUtils.put(ObservabilityUtils.CORRELATION_ID, correlationId);
+            ObservabilityUtils.put(ObservabilityUtils.USER_ID, userId);
+            ObservabilityUtils.put(ObservabilityUtils.SERVICE, serviceName);
+            ObservabilityUtils.put(ObservabilityUtils.ENVIRONMENT, environment);
             return invocation.proceed();
         } finally {
             MDC.clear();

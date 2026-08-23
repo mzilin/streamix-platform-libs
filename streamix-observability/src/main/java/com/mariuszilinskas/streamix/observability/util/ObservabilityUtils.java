@@ -5,9 +5,17 @@ import org.slf4j.MDC;
 
 import java.util.UUID;
 
-public final class LogContextManager {
+public final class ObservabilityUtils {
 
-    private LogContextManager() {
+    public static final String CORRELATION_ID = "correlation_id";
+    public static final String USER_ID = "user_id";
+    public static final String SERVICE = "service";
+    public static final String ENVIRONMENT = "environment";
+
+    public static final String CORRELATION_HEADER = "X-Correlation-Id";
+    public static final String USER_ID_HEADER = "X-User-Id";
+
+    private ObservabilityUtils() {
     }
 
     public static void put(String key, String value) {

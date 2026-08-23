@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.kafka;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.jspecify.annotations.NonNull;
@@ -14,14 +14,14 @@ public final class StreamixKafkaProducerInterceptor implements ProducerIntercept
     @Override
     @NonNull
     public ProducerRecord<Object, Object> onSend(@NonNull ProducerRecord<Object, Object> record) {
-        String correlationId = MDC.get(LogContext.CORRELATION_ID);
-        String userId = MDC.get(LogContext.USER_ID);
+        String correlationId = MDC.get(ObservabilityUtils.CORRELATION_ID);
+        String userId = MDC.get(ObservabilityUtils.USER_ID);
 
         if (correlationId != null) {
-            record.headers().add(LogContext.CORRELATION_HEADER, correlationId.getBytes(StandardCharsets.UTF_8));
+            record.headers().add(ObservabilityUtils.CORRELATION_HEADER, correlationId.getBytes(StandardCharsets.UTF_8));
         }
         if (userId != null) {
-            record.headers().add(LogContext.USER_ID_HEADER, userId.getBytes(StandardCharsets.UTF_8));
+            record.headers().add(ObservabilityUtils.USER_ID_HEADER, userId.getBytes(StandardCharsets.UTF_8));
         }
 
         return record;

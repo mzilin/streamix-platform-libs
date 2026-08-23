@@ -1,7 +1,6 @@
 package com.mariuszilinskas.streamix.observability.filter;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
-import com.mariuszilinskas.streamix.observability.util.LogContextManager;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,17 +30,17 @@ public final class StreamixLoggingFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String correlationId = LogContextManager.resolveCorrelationId(request.getHeader(LogContext.CORRELATION_HEADER));
-        String userId = request.getHeader(LogContext.USER_ID_HEADER);
+        String correlationId = ObservabilityUtils.resolveCorrelationId(request.getHeader(ObservabilityUtils.CORRELATION_HEADER));
+        String userId = request.getHeader(ObservabilityUtils.USER_ID_HEADER);
 
         Map<String, String> previousContext = MDC.getCopyOfContextMap();
 
         try {
-            LogContextManager.put(LogContext.CORRELATION_ID, correlationId);
-            LogContextManager.put(LogContext.USER_ID, userId);
-            LogContextManager.put(LogContext.SERVICE, serviceName);
-            LogContextManager.put(LogContext.ENVIRONMENT, environment);
-            response.setHeader(LogContext.CORRELATION_HEADER, correlationId);
+            ObservabilityUtils.put(ObservabilityUtils.CORRELATION_ID, correlationId);
+            ObservabilityUtils.put(ObservabilityUtils.USER_ID, userId);
+            ObservabilityUtils.put(ObservabilityUtils.SERVICE, serviceName);
+            ObservabilityUtils.put(ObservabilityUtils.ENVIRONMENT, environment);
+            response.setHeader(ObservabilityUtils.CORRELATION_HEADER, correlationId);
             filterChain.doFilter(request, response);
         } finally {
             restoreContext(previousContext);

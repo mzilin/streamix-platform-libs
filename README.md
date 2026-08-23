@@ -111,9 +111,18 @@ Use `ErrorResponse` and `FieldErrorResponse` in global exception handlers (`@Res
 
 ```java
 @ExceptionHandler(ResourceNotFoundException.class)
-public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
-    var body = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Not Found", ex.getMessage());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+public ResponseEntity<ErrorResponse> handleNotFound(
+        ResourceNotFoundException ex
+) {
+  var body = new ErrorResponse(
+          HttpStatus.NOT_FOUND.value(),
+          "Not Found",
+          ex.getMessage()
+  );
+
+  return ResponseEntity
+          .status(HttpStatus.NOT_FOUND)
+          .body(body);
 }
 ```
 
@@ -121,11 +130,26 @@ For validation failures, use `FieldErrorResponse` to surface per-field errors:
 
 ```java
 @ExceptionHandler(MethodArgumentNotValidException.class)
-public ResponseEntity<FieldErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-    Map<String, String> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
-        .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-    var body = new FieldErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request", fieldErrors);
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+public ResponseEntity<FieldErrorResponse> handleValidation(
+        MethodArgumentNotValidException ex
+) {
+    Map<String, String> fieldErrors = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .collect(Collectors.toMap(
+                    FieldError::getField,
+                    FieldError::getDefaultMessage
+            ));
+
+    var body = new FieldErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Bad Request",
+            fieldErrors
+    );
+    
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(body);
 }
 ```
 

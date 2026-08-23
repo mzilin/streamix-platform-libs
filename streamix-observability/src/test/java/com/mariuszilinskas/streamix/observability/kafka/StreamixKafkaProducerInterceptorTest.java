@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.kafka;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.junit.jupiter.api.AfterEach;
@@ -22,15 +22,15 @@ class StreamixKafkaProducerInterceptorTest {
 
     @Test
     void writesMdcValuesToRecordHeaders() {
-        MDC.put(LogContext.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
-        MDC.put(LogContext.USER_ID, "user-6");
+        MDC.put(ObservabilityUtils.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
+        MDC.put(ObservabilityUtils.USER_ID, "user-6");
 
         ProducerRecord<Object, Object> record = new ProducerRecord<>("topic", "value");
         ProducerRecord<Object, Object> result = interceptor.onSend(record);
 
-        assertThat(headerValue(result, LogContext.CORRELATION_HEADER))
+        assertThat(headerValue(result, ObservabilityUtils.CORRELATION_HEADER))
                 .isEqualTo("a1b2c3d4-e5f6-7890-abcd-ef1234567890");
-        assertThat(headerValue(result, LogContext.USER_ID_HEADER)).isEqualTo("user-6");
+        assertThat(headerValue(result, ObservabilityUtils.USER_ID_HEADER)).isEqualTo("user-6");
     }
 
     @Test
@@ -38,13 +38,13 @@ class StreamixKafkaProducerInterceptorTest {
         ProducerRecord<Object, Object> record = new ProducerRecord<>("topic", "value");
         ProducerRecord<Object, Object> result = interceptor.onSend(record);
 
-        assertThat(result.headers().lastHeader(LogContext.CORRELATION_HEADER)).isNull();
-        assertThat(result.headers().lastHeader(LogContext.USER_ID_HEADER)).isNull();
+        assertThat(result.headers().lastHeader(ObservabilityUtils.CORRELATION_HEADER)).isNull();
+        assertThat(result.headers().lastHeader(ObservabilityUtils.USER_ID_HEADER)).isNull();
     }
 
     @Test
     void returnsOriginalRecordInstance() {
-        MDC.put(LogContext.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
+        MDC.put(ObservabilityUtils.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
         ProducerRecord<Object, Object> record = new ProducerRecord<>("topic", "value");
 
         assertThat(interceptor.onSend(record)).isSameAs(record);

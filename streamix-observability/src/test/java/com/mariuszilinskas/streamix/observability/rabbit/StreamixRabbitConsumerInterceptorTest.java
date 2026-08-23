@@ -1,7 +1,6 @@
 package com.mariuszilinskas.streamix.observability.rabbit;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
-import com.mariuszilinskas.streamix.observability.util.LogContextManager;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -34,16 +33,16 @@ class StreamixRabbitConsumerInterceptorTest {
     void extractsCorrelationIdAndUserIdFromMessageHeaders() throws Throwable {
         String correlationId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
         MessageProperties props = new MessageProperties();
-        props.setHeader(LogContext.CORRELATION_HEADER, correlationId);
-        props.setHeader(LogContext.USER_ID_HEADER, "user-5");
+        props.setHeader(ObservabilityUtils.CORRELATION_HEADER, correlationId);
+        props.setHeader(ObservabilityUtils.USER_ID_HEADER, "user-5");
         Message message = new Message(new byte[0], props);
 
         AtomicReference<String> capturedCorrelation = new AtomicReference<>();
         AtomicReference<String> capturedUser = new AtomicReference<>();
         when(invocation.getArguments()).thenReturn(new Object[]{message});
         when(invocation.proceed()).thenAnswer(inv -> {
-            capturedCorrelation.set(MDC.get(LogContext.CORRELATION_ID));
-            capturedUser.set(MDC.get(LogContext.USER_ID));
+            capturedCorrelation.set(MDC.get(ObservabilityUtils.CORRELATION_ID));
+            capturedUser.set(MDC.get(ObservabilityUtils.USER_ID));
             return null;
         });
 
@@ -60,14 +59,14 @@ class StreamixRabbitConsumerInterceptorTest {
 
         when(invocation.getArguments()).thenReturn(new Object[]{message});
         when(invocation.proceed()).thenAnswer(inv -> {
-            capturedCorrelation.set(MDC.get(LogContext.CORRELATION_ID));
+            capturedCorrelation.set(MDC.get(ObservabilityUtils.CORRELATION_ID));
             return null;
         });
 
         interceptor.invoke(invocation);
 
         assertThat(capturedCorrelation.get()).isNotNull();
-        assertThat(LogContextManager.isValidCorrelationId(capturedCorrelation.get())).isTrue();
+        assertThat(ObservabilityUtils.isValidCorrelationId(capturedCorrelation.get())).isTrue();
     }
 
     @Test
@@ -79,8 +78,8 @@ class StreamixRabbitConsumerInterceptorTest {
 
         interceptor.invoke(invocation);
 
-        assertThat(MDC.get(LogContext.CORRELATION_ID)).isNull();
-        assertThat(MDC.get(LogContext.USER_ID)).isNull();
+        assertThat(MDC.get(ObservabilityUtils.CORRELATION_ID)).isNull();
+        assertThat(MDC.get(ObservabilityUtils.USER_ID)).isNull();
         assertThat(MDC.get("pre-existing")).isEqualTo("value");
     }
 
@@ -96,7 +95,7 @@ class StreamixRabbitConsumerInterceptorTest {
         } catch (RuntimeException ignored) {
         }
 
-        assertThat(MDC.get(LogContext.CORRELATION_ID)).isNull();
+        assertThat(MDC.get(ObservabilityUtils.CORRELATION_ID)).isNull();
         assertThat(MDC.get("pre-existing")).isEqualTo("value");
     }
 }

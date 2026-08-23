@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.grpc;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -17,8 +17,8 @@ public final class StreamixGrpcClientInterceptor implements ClientInterceptor {
             CallOptions callOptions,
             Channel next
     ) {
-        String correlationId = MDC.get(LogContext.CORRELATION_ID);
-        String userId = MDC.get(LogContext.USER_ID);
+        String correlationId = MDC.get(ObservabilityUtils.CORRELATION_ID);
+        String userId = MDC.get(ObservabilityUtils.USER_ID);
 
         return new ForwardingClientCall.SimpleForwardingClientCall<>(next.newCall(method, callOptions)) {
             @Override

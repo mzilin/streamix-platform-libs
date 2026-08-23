@@ -1,7 +1,6 @@
 package com.mariuszilinskas.streamix.observability.filter;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
-import com.mariuszilinskas.streamix.observability.util.LogContextManager;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import jakarta.servlet.FilterChain;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +25,8 @@ class StreamixLoggingFilterTest {
     void populatesAllMdcKeysOnRequest() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String correlationId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
-        request.addHeader(LogContext.CORRELATION_HEADER, correlationId);
-        request.addHeader(LogContext.USER_ID_HEADER, "user-42");
+        request.addHeader(ObservabilityUtils.CORRELATION_HEADER, correlationId);
+        request.addHeader(ObservabilityUtils.USER_ID_HEADER, "user-42");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain chain = mock(FilterChain.class);
@@ -35,7 +34,7 @@ class StreamixLoggingFilterTest {
         filter.doFilter(request, response, chain);
 
         verify(chain).doFilter(request, response);
-        assertThat(response.getHeader(LogContext.CORRELATION_HEADER)).isEqualTo(correlationId);
+        assertThat(response.getHeader(ObservabilityUtils.CORRELATION_HEADER)).isEqualTo(correlationId);
     }
 
     @Test
@@ -46,23 +45,23 @@ class StreamixLoggingFilterTest {
 
         filter.doFilter(request, response, chain);
 
-        String echoed = response.getHeader(LogContext.CORRELATION_HEADER);
+        String echoed = response.getHeader(ObservabilityUtils.CORRELATION_HEADER);
         assertThat(echoed).isNotNull();
-        assertThat(LogContextManager.isValidCorrelationId(echoed)).isTrue();
+        assertThat(ObservabilityUtils.isValidCorrelationId(echoed)).isTrue();
     }
 
     @Test
     void generatesCorrelationIdForInvalidUuid() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addHeader(LogContext.CORRELATION_HEADER, "not-a-uuid");
+        request.addHeader(ObservabilityUtils.CORRELATION_HEADER, "not-a-uuid");
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain chain = mock(FilterChain.class);
 
         filter.doFilter(request, response, chain);
 
-        String echoed = response.getHeader(LogContext.CORRELATION_HEADER);
+        String echoed = response.getHeader(ObservabilityUtils.CORRELATION_HEADER);
         assertThat(echoed).isNotEqualTo("not-a-uuid");
-        assertThat(LogContextManager.isValidCorrelationId(echoed)).isTrue();
+        assertThat(ObservabilityUtils.isValidCorrelationId(echoed)).isTrue();
     }
 
     @Test
@@ -74,10 +73,10 @@ class StreamixLoggingFilterTest {
 
         filter.doFilter(request, response, chain);
 
-        assertThat(MDC.get(LogContext.CORRELATION_ID)).isNull();
-        assertThat(MDC.get(LogContext.USER_ID)).isNull();
-        assertThat(MDC.get(LogContext.SERVICE)).isNull();
-        assertThat(MDC.get(LogContext.ENVIRONMENT)).isNull();
+        assertThat(MDC.get(ObservabilityUtils.CORRELATION_ID)).isNull();
+        assertThat(MDC.get(ObservabilityUtils.USER_ID)).isNull();
+        assertThat(MDC.get(ObservabilityUtils.SERVICE)).isNull();
+        assertThat(MDC.get(ObservabilityUtils.ENVIRONMENT)).isNull();
         assertThat(MDC.get("existing-key")).isEqualTo("existing-value");
     }
 }

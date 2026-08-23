@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.rabbit;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.MDC;
 import org.springframework.amqp.AmqpException;
@@ -12,14 +12,14 @@ public final class StreamixRabbitProducerPostProcessor implements MessagePostPro
     @Override
     @NonNull
     public Message postProcessMessage(@NonNull Message message) throws AmqpException {
-        String correlationId = MDC.get(LogContext.CORRELATION_ID);
-        String userId = MDC.get(LogContext.USER_ID);
+        String correlationId = MDC.get(ObservabilityUtils.CORRELATION_ID);
+        String userId = MDC.get(ObservabilityUtils.USER_ID);
 
         if (correlationId != null) {
-            message.getMessageProperties().setHeader(LogContext.CORRELATION_HEADER, correlationId);
+            message.getMessageProperties().setHeader(ObservabilityUtils.CORRELATION_HEADER, correlationId);
         }
         if (userId != null) {
-            message.getMessageProperties().setHeader(LogContext.USER_ID_HEADER, userId);
+            message.getMessageProperties().setHeader(ObservabilityUtils.USER_ID_HEADER, userId);
         }
 
         return message;

@@ -1,7 +1,6 @@
 package com.mariuszilinskas.streamix.observability.grpc;
 
-import com.mariuszilinskas.streamix.observability.util.LogContext;
-import com.mariuszilinskas.streamix.observability.util.LogContextManager;
+import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
 import io.grpc.Metadata;
 import io.grpc.ServerCall;
 import io.grpc.ServerCallHandler;
@@ -50,7 +49,7 @@ class StreamixGrpcServerInterceptorTest {
 
         interceptor.interceptCall(serverCall, headers, next);
 
-        assertThat(MDC.get(LogContext.CORRELATION_ID)).isEqualTo(correlationId);
+        assertThat(MDC.get(ObservabilityUtils.CORRELATION_ID)).isEqualTo(correlationId);
     }
 
     @Test
@@ -59,9 +58,9 @@ class StreamixGrpcServerInterceptorTest {
 
         interceptor.interceptCall(serverCall, headers, next);
 
-        String correlationId = MDC.get(LogContext.CORRELATION_ID);
+        String correlationId = MDC.get(ObservabilityUtils.CORRELATION_ID);
         assertThat(correlationId).isNotNull();
-        assertThat(LogContextManager.isValidCorrelationId(correlationId)).isTrue();
+        assertThat(ObservabilityUtils.isValidCorrelationId(correlationId)).isTrue();
     }
 
     @Test
@@ -71,7 +70,7 @@ class StreamixGrpcServerInterceptorTest {
 
         interceptor.interceptCall(serverCall, headers, next);
 
-        assertThat(MDC.get(LogContext.USER_ID)).isEqualTo("user-99");
+        assertThat(MDC.get(ObservabilityUtils.USER_ID)).isEqualTo("user-99");
     }
 
     @Test
@@ -101,7 +100,7 @@ class StreamixGrpcServerInterceptorTest {
         ServerCall.Listener<Object> wrappedListener = interceptor.interceptCall(serverCall, headers, next);
         wrappedListener.onComplete();
 
-        assertThat(MDC.get(LogContext.CORRELATION_ID)).isNull();
+        assertThat(MDC.get(ObservabilityUtils.CORRELATION_ID)).isNull();
         assertThat(MDC.get("pre-existing")).isEqualTo("value");
     }
 
@@ -113,7 +112,7 @@ class StreamixGrpcServerInterceptorTest {
         ServerCall.Listener<Object> wrappedListener = interceptor.interceptCall(serverCall, headers, next);
         wrappedListener.onCancel();
 
-        assertThat(MDC.get(LogContext.CORRELATION_ID)).isNull();
+        assertThat(MDC.get(ObservabilityUtils.CORRELATION_ID)).isNull();
         assertThat(MDC.get("pre-existing")).isEqualTo("value");
     }
 }

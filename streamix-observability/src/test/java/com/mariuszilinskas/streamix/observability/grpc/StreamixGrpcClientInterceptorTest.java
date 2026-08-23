@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.grpc;
 
-import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
+import com.mariuszilinskas.streamix.observability.context.LogContext;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -17,6 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import static com.mariuszilinskas.streamix.observability.grpc.GrpcMetadataKeys.*;
 
 @ExtendWith(MockitoExtension.class)
 class StreamixGrpcClientInterceptorTest {
@@ -38,8 +40,8 @@ class StreamixGrpcClientInterceptorTest {
     @Test
     @SuppressWarnings("unchecked")
     void writesMdcCorrelationIdToOutgoingMetadata() {
-        MDC.put(ObservabilityUtils.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
-        MDC.put(ObservabilityUtils.USER_ID, "user-7");
+        MDC.put(LogContext.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
+        MDC.put(LogContext.USER_ID, "user-7");
         when(channel.newCall(any(), any())).thenReturn(clientCall);
 
         MethodDescriptor<Object, Object> method = mock(MethodDescriptor.class);
@@ -49,9 +51,9 @@ class StreamixGrpcClientInterceptorTest {
         Metadata sentHeaders = new Metadata();
         call.start(responseListener, sentHeaders);
 
-        assertThat(sentHeaders.get(StreamixGrpcServerInterceptor.CORRELATION_ID_KEY))
+        assertThat(sentHeaders.get(CORRELATION_ID_KEY))
                 .isEqualTo("a1b2c3d4-e5f6-7890-abcd-ef1234567890");
-        assertThat(sentHeaders.get(StreamixGrpcServerInterceptor.USER_ID_KEY)).isEqualTo("user-7");
+        assertThat(sentHeaders.get(USER_ID_KEY)).isEqualTo("user-7");
     }
 
     @Test
@@ -66,7 +68,7 @@ class StreamixGrpcClientInterceptorTest {
         Metadata sentHeaders = new Metadata();
         call.start(responseListener, sentHeaders);
 
-        assertThat(sentHeaders.get(StreamixGrpcServerInterceptor.CORRELATION_ID_KEY)).isNull();
-        assertThat(sentHeaders.get(StreamixGrpcServerInterceptor.USER_ID_KEY)).isNull();
+        assertThat(sentHeaders.get(CORRELATION_ID_KEY)).isNull();
+        assertThat(sentHeaders.get(USER_ID_KEY)).isNull();
     }
 }

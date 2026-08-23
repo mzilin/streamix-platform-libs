@@ -1,4 +1,4 @@
-package com.mariuszilinskas.streamix.observability.util;
+package com.mariuszilinskas.streamix.observability.context;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ObservabilityUtilsTest {
+class LogContextManagerTest {
 
     @AfterEach
     void tearDown() {
@@ -17,28 +17,28 @@ class ObservabilityUtilsTest {
 
     @Test
     void putShouldStoreValidKeyAndValue() {
-        ObservabilityUtils.put("test-key", "test-value");
+        LogContextManager.put("test-key", "test-value");
 
         assertEquals("test-value", MDC.get("test-key"));
     }
 
     @Test
     void putShouldIgnoreBlankKey() {
-        ObservabilityUtils.put("   ", "test-value");
+        LogContextManager.put("   ", "test-value");
 
         assertTrue(MDC.getCopyOfContextMap() == null || MDC.getCopyOfContextMap().isEmpty());
     }
 
     @Test
     void putShouldIgnoreNullValue() {
-        ObservabilityUtils.put("test-key", null);
+        LogContextManager.put("test-key", null);
 
         assertNull(MDC.get("test-key"));
     }
 
     @Test
     void putShouldIgnoreBlankValue() {
-        ObservabilityUtils.put("test-key", "   ");
+        LogContextManager.put("test-key", "   ");
 
         assertNull(MDC.get("test-key"));
     }
@@ -47,7 +47,7 @@ class ObservabilityUtilsTest {
     void removeShouldRemoveExistingValue() {
         MDC.put("test-key", "test-value");
 
-        ObservabilityUtils.remove("test-key");
+        LogContextManager.remove("test-key");
 
         assertNull(MDC.get("test-key"));
     }
@@ -56,7 +56,7 @@ class ObservabilityUtilsTest {
     void removeShouldIgnoreNullKey() {
         MDC.put("test-key", "test-value");
 
-        ObservabilityUtils.remove(null);
+        LogContextManager.remove(null);
 
         assertEquals("test-value", MDC.get("test-key"));
     }
@@ -65,7 +65,7 @@ class ObservabilityUtilsTest {
     void removeShouldIgnoreBlankKey() {
         MDC.put("test-key", "test-value");
 
-        ObservabilityUtils.remove("   ");
+        LogContextManager.remove("   ");
 
         assertEquals("test-value", MDC.get("test-key"));
     }
@@ -74,64 +74,64 @@ class ObservabilityUtilsTest {
     void resolveCorrelationIdShouldReturnValidCorrelationIdUnchanged() {
         String correlationId = UUID.randomUUID().toString();
 
-        String result = ObservabilityUtils.resolveCorrelationId(correlationId);
+        String result = LogContextManager.resolveCorrelationId(correlationId);
 
         assertEquals(correlationId, result);
     }
 
     @Test
     void resolveCorrelationIdShouldGenerateNewIdForNullValue() {
-        String result = ObservabilityUtils.resolveCorrelationId(null);
+        String result = LogContextManager.resolveCorrelationId(null);
 
         assertNotNull(result);
-        assertTrue(ObservabilityUtils.isValidCorrelationId(result));
+        assertTrue(LogContextManager.isValidCorrelationId(result));
     }
 
     @Test
     void resolveCorrelationIdShouldGenerateNewIdForBlankValue() {
-        String result = ObservabilityUtils.resolveCorrelationId("   ");
+        String result = LogContextManager.resolveCorrelationId("   ");
 
         assertNotNull(result);
-        assertTrue(ObservabilityUtils.isValidCorrelationId(result));
+        assertTrue(LogContextManager.isValidCorrelationId(result));
     }
 
     @Test
     void resolveCorrelationIdShouldGenerateNewIdForInvalidValue() {
-        String result = ObservabilityUtils.resolveCorrelationId("not-a-uuid");
+        String result = LogContextManager.resolveCorrelationId("not-a-uuid");
 
         assertNotNull(result);
-        assertTrue(ObservabilityUtils.isValidCorrelationId(result));
+        assertTrue(LogContextManager.isValidCorrelationId(result));
     }
 
     @Test
     void isValidCorrelationIdShouldReturnTrueForValidUuid() {
         String correlationId = UUID.randomUUID().toString();
 
-        assertTrue(ObservabilityUtils.isValidCorrelationId(correlationId));
+        assertTrue(LogContextManager.isValidCorrelationId(correlationId));
     }
 
     @Test
     void isValidCorrelationIdShouldReturnFalseForNull() {
-        assertFalse(ObservabilityUtils.isValidCorrelationId(null));
+        assertFalse(LogContextManager.isValidCorrelationId(null));
     }
 
     @Test
     void isValidCorrelationIdShouldReturnFalseForBlankValue() {
-        assertFalse(ObservabilityUtils.isValidCorrelationId(""));
-        assertFalse(ObservabilityUtils.isValidCorrelationId("   "));
+        assertFalse(LogContextManager.isValidCorrelationId(""));
+        assertFalse(LogContextManager.isValidCorrelationId("   "));
     }
 
     @Test
     void isValidCorrelationIdShouldReturnFalseForInvalidUuid() {
-        assertFalse(ObservabilityUtils.isValidCorrelationId("not-a-uuid"));
-        assertFalse(ObservabilityUtils.isValidCorrelationId("12345"));
-        assertFalse(ObservabilityUtils.isValidCorrelationId("550e8400-e29b-41d4-a716"));
+        assertFalse(LogContextManager.isValidCorrelationId("not-a-uuid"));
+        assertFalse(LogContextManager.isValidCorrelationId("12345"));
+        assertFalse(LogContextManager.isValidCorrelationId("550e8400-e29b-41d4-a716"));
     }
 
     @Test
     void isValidCorrelationIdShouldAcceptUuidWithUppercaseCharacters() {
         String correlationId = UUID.randomUUID().toString().toUpperCase();
 
-        assertTrue(ObservabilityUtils.isValidCorrelationId(correlationId));
+        assertTrue(LogContextManager.isValidCorrelationId(correlationId));
     }
 }

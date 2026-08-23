@@ -1,21 +1,13 @@
-package com.mariuszilinskas.streamix.observability.util;
+package com.mariuszilinskas.streamix.observability.context;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.MDC;
 
 import java.util.UUID;
 
-public final class ObservabilityUtils {
+public final class LogContextManager {
 
-    public static final String CORRELATION_ID = "correlation_id";
-    public static final String USER_ID = "user_id";
-    public static final String SERVICE = "service";
-    public static final String ENVIRONMENT = "environment";
-
-    public static final String CORRELATION_HEADER = "X-Correlation-Id";
-    public static final String USER_ID_HEADER = "X-User-Id";
-
-    private ObservabilityUtils() {
+    private LogContextManager() {
     }
 
     public static void put(String key, String value) {

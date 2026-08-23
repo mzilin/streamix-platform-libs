@@ -1,5 +1,6 @@
 plugins {
     id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'co.uzzu.dotenv.gradle' version '4.0.0'
 }
 
 group = 'com.mariuszilinskas.streamix'
@@ -24,6 +25,7 @@ subprojects {
         toolchain {
             languageVersion = JavaLanguageVersion.of(21)
         }
+        withSourcesJar()
     }
 
     dependencyManagement {
@@ -38,23 +40,18 @@ subprojects {
                 from components.java
             }
         }
-    }
 
-    test {
-        useJUnitPlatform()
-
-        testLogging {
-            events 'passed', 'skipped', 'failed'
-        }
-
-        finalizedBy jacocoTestReport
-    }
-
-    jacocoTestReport {
-        dependsOn test
-        reports {
-            xml.required = true
-            html.required = true
+        if (env.isPresent('CODE_ARTIFACT_URL') && env.isPresent('CODE_ARTIFACT_TOKEN')) {
+            repositories {
+                maven {
+                    name = 'CodeArtifact'
+                    url = uri(env.fetch('CODE_ARTIFACT_URL'))
+                    credentials {
+                        username = 'aws'
+                        password = env.fetch('CODE_ARTIFACT_TOKEN')
+                    }
+                }
+            }
         }
     }
 
@@ -64,5 +61,21 @@ subprojects {
 
     compileTestJava {
         options.compilerArgs << '-Xlint:deprecation'
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events 'passed', 'skipped', 'failed'
+        }
+        finalizedBy jacocoTestReport
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+            html.required = true
+        }
     }
 }

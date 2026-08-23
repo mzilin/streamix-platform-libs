@@ -1,8 +1,19 @@
 dependencies {
-    api 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.slf4j:slf4j-api'
 
-    implementation 'org.springframework:spring-web'
-    implementation 'org.springframework:spring-webflux'
+    compileOnly 'org.jspecify:jspecify'
+    compileOnly 'org.springframework:spring-web'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api'
+    compileOnly 'io.grpc:grpc-api'
+    compileOnly 'org.springframework.amqp:spring-rabbit'
+    compileOnly 'org.springframework.kafka:spring-kafka'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework:spring-webmvc'
+    testImplementation 'jakarta.servlet:jakarta.servlet-api'
+    testImplementation 'io.grpc:grpc-api'
+    testImplementation 'org.springframework.amqp:spring-rabbit'
+    testImplementation 'org.springframework.kafka:spring-kafka'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

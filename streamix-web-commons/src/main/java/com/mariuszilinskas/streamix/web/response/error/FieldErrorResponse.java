@@ -1,4 +1,4 @@
-package com.mariuszilinskas.streamix.web.dto;
+package com.mariuszilinskas.streamix.web.response.error;
 
 import lombok.Getter;
 import lombok.Setter;

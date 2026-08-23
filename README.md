@@ -1,6 +1,6 @@
 # Streamix – Platform Libraries
 
-![Build](https://img.shields.io/github/actions/workflow/status/mzilin/streamix-platform/build.yml?label=Build&logo=github&logoColor=white&style=flat)
+![Build](https://img.shields.io/github/actions/workflow/status/mzilin/streamix-platform-libs/build.yml?label=Build&logo=github&logoColor=white&style=flat)
 ![Status](https://img.shields.io/badge/status-in_progress-yellow?label=Status)
 
 

@@ -1,6 +1,7 @@
 package com.mariuszilinskas.streamix.observability.rabbit;
 
-import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
+import com.mariuszilinskas.streamix.observability.context.LogContext;
+import com.mariuszilinskas.streamix.observability.context.LogContextManager;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jspecify.annotations.NonNull;
@@ -29,21 +30,21 @@ public final class StreamixRabbitConsumerInterceptor implements MethodIntercepto
 
         if (message != null) {
             Map<String, Object> headers = message.getMessageProperties().getHeaders();
-            correlationId = ObservabilityUtils.resolveCorrelationId(
-                    headerAsString(headers.get(ObservabilityUtils.CORRELATION_HEADER))
+            correlationId = LogContextManager.resolveCorrelationId(
+                    headerAsString(headers.get(LogContext.CORRELATION_HEADER))
             );
-            userId = headerAsString(headers.get(ObservabilityUtils.USER_ID_HEADER));
+            userId = headerAsString(headers.get(LogContext.USER_ID_HEADER));
         } else {
-            correlationId = ObservabilityUtils.resolveCorrelationId(null);
+            correlationId = LogContextManager.resolveCorrelationId(null);
         }
 
         Map<String, String> previousContext = MDC.getCopyOfContextMap();
 
         try {
-            ObservabilityUtils.put(ObservabilityUtils.CORRELATION_ID, correlationId);
-            ObservabilityUtils.put(ObservabilityUtils.USER_ID, userId);
-            ObservabilityUtils.put(ObservabilityUtils.SERVICE, serviceName);
-            ObservabilityUtils.put(ObservabilityUtils.ENVIRONMENT, environment);
+            LogContextManager.put(LogContext.CORRELATION_ID, correlationId);
+            LogContextManager.put(LogContext.USER_ID, userId);
+            LogContextManager.put(LogContext.SERVICE, serviceName);
+            LogContextManager.put(LogContext.ENVIRONMENT, environment);
             return invocation.proceed();
         } finally {
             MDC.clear();

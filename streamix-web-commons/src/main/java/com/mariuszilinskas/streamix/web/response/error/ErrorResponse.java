@@ -1,7 +1,7 @@
-package com.mariuszilinskas.streamix.web.dto;
+package com.mariuszilinskas.streamix.web.response.error;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.mariuszilinskas.streamix.web.util.WebCommonsUtils;
+import com.mariuszilinskas.streamix.web.response.ResponseConstants;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 @Setter
 public class ErrorResponse {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = WebCommonsUtils.TIMESTAMP_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ResponseConstants.TIMESTAMP_FORMAT)
     private final ZonedDateTime timestamp;
     private final int status;
     private final String error;

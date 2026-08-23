@@ -1,6 +1,7 @@
 package com.mariuszilinskas.streamix.observability.kafka;
 
-import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
+import com.mariuszilinskas.streamix.observability.context.LogContext;
+import com.mariuszilinskas.streamix.observability.context.LogContextManager;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.internals.RecordHeaders;
@@ -33,10 +34,10 @@ class StreamixKafkaConsumerInterceptorTest {
     private ConsumerRecord<Object, Object> recordWithHeaders(String correlationId, String userId) {
         RecordHeaders headers = new RecordHeaders();
         if (correlationId != null) {
-            headers.add(ObservabilityUtils.CORRELATION_HEADER, correlationId.getBytes(StandardCharsets.UTF_8));
+            headers.add(LogContext.CORRELATION_HEADER, correlationId.getBytes(StandardCharsets.UTF_8));
         }
         if (userId != null) {
-            headers.add(ObservabilityUtils.USER_ID_HEADER, userId.getBytes(StandardCharsets.UTF_8));
+            headers.add(LogContext.USER_ID_HEADER, userId.getBytes(StandardCharsets.UTF_8));
         }
         return new ConsumerRecord<Object, Object>(
                 "topic", 0, 0L, 0L, TimestampType.NO_TIMESTAMP_TYPE, 0, 0, null, null, headers, Optional.empty()
@@ -50,8 +51,8 @@ class StreamixKafkaConsumerInterceptorTest {
 
         interceptor.intercept(record, consumer);
 
-        assertThat(MDC.get(ObservabilityUtils.CORRELATION_ID)).isEqualTo(correlationId);
-        assertThat(MDC.get(ObservabilityUtils.USER_ID)).isEqualTo("user-8");
+        assertThat(MDC.get(LogContext.CORRELATION_ID)).isEqualTo(correlationId);
+        assertThat(MDC.get(LogContext.USER_ID)).isEqualTo("user-8");
     }
 
     @Test
@@ -60,9 +61,9 @@ class StreamixKafkaConsumerInterceptorTest {
 
         interceptor.intercept(record, consumer);
 
-        String correlationId = MDC.get(ObservabilityUtils.CORRELATION_ID);
+        String correlationId = MDC.get(LogContext.CORRELATION_ID);
         assertThat(correlationId).isNotNull();
-        assertThat(ObservabilityUtils.isValidCorrelationId(correlationId)).isTrue();
+        assertThat(LogContextManager.isValidCorrelationId(correlationId)).isTrue();
     }
 
     @Test
@@ -75,7 +76,7 @@ class StreamixKafkaConsumerInterceptorTest {
 
         interceptor.success(record, consumer);
 
-        assertThat(MDC.get(ObservabilityUtils.CORRELATION_ID)).isNull();
+        assertThat(MDC.get(LogContext.CORRELATION_ID)).isNull();
         assertThat(MDC.get("pre-existing")).isEqualTo("value");
     }
 
@@ -89,7 +90,7 @@ class StreamixKafkaConsumerInterceptorTest {
 
         interceptor.failure(record, new RuntimeException("fail"), consumer);
 
-        assertThat(MDC.get(ObservabilityUtils.CORRELATION_ID)).isNull();
+        assertThat(MDC.get(LogContext.CORRELATION_ID)).isNull();
         assertThat(MDC.get("pre-existing")).isEqualTo("value");
     }
 

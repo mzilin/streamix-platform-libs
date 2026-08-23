@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.async;
 
-import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
+import com.mariuszilinskas.streamix.observability.context.LogContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
@@ -20,15 +20,15 @@ class StreamixMdcTaskDecoratorTest {
 
     @Test
     void propagatesMdcToWorkerThread() throws InterruptedException {
-        MDC.put(ObservabilityUtils.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
-        MDC.put(ObservabilityUtils.USER_ID, "user-11");
+        MDC.put(LogContext.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
+        MDC.put(LogContext.USER_ID, "user-11");
 
         AtomicReference<String> capturedCorrelation = new AtomicReference<>();
         AtomicReference<String> capturedUser = new AtomicReference<>();
 
         Runnable task = decorator.decorate(() -> {
-            capturedCorrelation.set(MDC.get(ObservabilityUtils.CORRELATION_ID));
-            capturedUser.set(MDC.get(ObservabilityUtils.USER_ID));
+            capturedCorrelation.set(MDC.get(LogContext.CORRELATION_ID));
+            capturedUser.set(MDC.get(LogContext.USER_ID));
         });
 
         Thread worker = new Thread(task);
@@ -41,7 +41,7 @@ class StreamixMdcTaskDecoratorTest {
 
     @Test
     void clearsMdcOnWorkerThreadAfterTask() throws InterruptedException {
-        MDC.put(ObservabilityUtils.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
+        MDC.put(LogContext.CORRELATION_ID, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
 
         AtomicReference<String> afterTaskMdc = new AtomicReference<>();
         Runnable task = decorator.decorate(() -> afterTaskMdc.set("before-clear"));
@@ -59,15 +59,15 @@ class StreamixMdcTaskDecoratorTest {
 
     @Test
     void capturesMdcAtSubmissionNotAtExecution() throws InterruptedException {
-        MDC.put(ObservabilityUtils.CORRELATION_ID, "original-id");
+        MDC.put(LogContext.CORRELATION_ID, "original-id");
         Runnable decorated = decorator.decorate(() -> {});
 
-        MDC.put(ObservabilityUtils.CORRELATION_ID, "changed-after-decoration");
+        MDC.put(LogContext.CORRELATION_ID, "changed-after-decoration");
 
         AtomicReference<String> capturedCorrelation = new AtomicReference<>();
         Thread worker = new Thread(() -> {
             decorated.run();
-            capturedCorrelation.set(MDC.get(ObservabilityUtils.CORRELATION_ID));
+            capturedCorrelation.set(MDC.get(LogContext.CORRELATION_ID));
         });
         worker.start();
         worker.join();
@@ -80,7 +80,7 @@ class StreamixMdcTaskDecoratorTest {
     void worksWithEmptyMdc() throws InterruptedException {
         AtomicReference<String> capturedCorrelation = new AtomicReference<>("sentinel");
         Runnable task = decorator.decorate(() ->
-                capturedCorrelation.set(MDC.get(ObservabilityUtils.CORRELATION_ID))
+                capturedCorrelation.set(MDC.get(LogContext.CORRELATION_ID))
         );
 
         Thread worker = new Thread(task);

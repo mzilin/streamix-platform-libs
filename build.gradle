@@ -49,14 +49,14 @@ subprojects {
             }
         }
 
-        if (env.isPresent('CODE_ARTIFACT_URL') && env.isPresent('CODE_ARTIFACT_TOKEN')) {
+        if (env.isPresent('GITHUB_TOKEN') && env.isPresent('GITHUB_ACTOR')) {
             repositories {
                 maven {
-                    name = 'CodeArtifact'
-                    url = uri(env.fetch('CODE_ARTIFACT_URL'))
+                    name = 'GitHubPackages'
+                    url = uri('https://maven.pkg.github.com/mzilin/streamix-platform-libs')
                     credentials {
-                        username = 'aws'
-                        password = env.fetch('CODE_ARTIFACT_TOKEN')
+                        username = env.fetch('GITHUB_ACTOR')
+                        password = env.fetch('GITHUB_TOKEN')
                     }
                 }
             }

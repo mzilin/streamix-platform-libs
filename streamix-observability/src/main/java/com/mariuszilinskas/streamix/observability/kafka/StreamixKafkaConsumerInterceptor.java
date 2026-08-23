@@ -1,6 +1,7 @@
 package com.mariuszilinskas.streamix.observability.kafka;
 
-import com.mariuszilinskas.streamix.observability.util.ObservabilityUtils;
+import com.mariuszilinskas.streamix.observability.context.LogContext;
+import com.mariuszilinskas.streamix.observability.context.LogContextManager;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
@@ -32,15 +33,15 @@ public final class StreamixKafkaConsumerInterceptor implements RecordInterceptor
     ) {
         previousContextHolder.set(MDC.getCopyOfContextMap());
 
-        String correlationId = ObservabilityUtils.resolveCorrelationId(
-                headerValue(record, ObservabilityUtils.CORRELATION_HEADER)
+        String correlationId = LogContextManager.resolveCorrelationId(
+                headerValue(record, LogContext.CORRELATION_HEADER)
         );
-        String userId = headerValue(record, ObservabilityUtils.USER_ID_HEADER);
+        String userId = headerValue(record, LogContext.USER_ID_HEADER);
 
-        ObservabilityUtils.put(ObservabilityUtils.CORRELATION_ID, correlationId);
-        ObservabilityUtils.put(ObservabilityUtils.USER_ID, userId);
-        ObservabilityUtils.put(ObservabilityUtils.SERVICE, serviceName);
-        ObservabilityUtils.put(ObservabilityUtils.ENVIRONMENT, environment);
+        LogContextManager.put(LogContext.CORRELATION_ID, correlationId);
+        LogContextManager.put(LogContext.USER_ID, userId);
+        LogContextManager.put(LogContext.SERVICE, serviceName);
+        LogContextManager.put(LogContext.ENVIRONMENT, environment);
 
         return record;
     }

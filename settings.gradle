@@ -1,4 +1,4 @@
-rootProject.name = 'streamix-platform'
+rootProject.name = 'streamix-platform-libs'
 
 include 'streamix-observability'
 include 'streamix-web-commons'

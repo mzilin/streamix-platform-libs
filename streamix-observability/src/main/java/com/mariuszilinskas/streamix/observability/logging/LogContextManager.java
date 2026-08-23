@@ -2,7 +2,7 @@ package com.mariuszilinskas.streamix.observability.logging;
 
 import org.slf4j.MDC;
 
-public class LogContextManager {
+public final class LogContextManager {
 
     private LogContextManager() {
     }

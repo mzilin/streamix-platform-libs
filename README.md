@@ -5,7 +5,7 @@
 ![Status](https://img.shields.io/badge/status-in_progress-yellow?label=Status)
 
 
-This repository contains shared Java libraries used across all **Streamix** (Video Streaming Platform) microservices. Each library is published as a standalone Maven artifact to either Maven Local (for local development) or AWS CodeArtifact (for CI/CD and shared environments).
+This repository contains shared Java libraries used across all **Streamix** (Video Streaming Platform) microservices. Each library is published as a standalone Maven artifact to Maven Local (for local development), GitHub Packages, or AWS CodeArtifact (for CI/CD and shared environments).
 
 For a complete system overview and links to all microservices, please refer to the [Microservices Hub Repository](https://github.com/mzilin/streamix-microservices-hub).
 
@@ -19,6 +19,7 @@ For a complete system overview and links to all microservices, please refer to t
   * [streamix-web-commons](#streamix-web-commons)
 * [Publishing Packages](#publishing-packages)
   * [Publish to Maven Local](#publish-to-maven-local)
+  * [Publish to GitHub Packages](#publish-to-github-packages)
   * [Publish to AWS CodeArtifact](#publish-to-aws-codeartifact)
 * [Testing](#testing)
 * [License](#license)
@@ -38,7 +39,8 @@ Each library is independently usable — services only include the modules they 
 - **Spring Boot** `4.1.0`: Rapid development framework for standalone, production-ready Java apps.
 - **Gradle** `9.5.1`: Powerful build tool with fast incremental builds and dependency management.
 - **Maven Publish Plugin**: Packages and publishes each library as a Maven artifact.
-- **AWS CodeArtifact**: Hosts published artifacts for shared access across services and CI/CD pipelines.
+- **GitHub Packages**: Hosts published artifacts for shared access across services and CI/CD pipelines.
+- **AWS CodeArtifact**: Alternative artifact registry for AWS-native CI/CD environments.
 
 
 ## Packages
@@ -192,6 +194,46 @@ repositories {
 ```
 
 > `mavenLocal()` should appear before `mavenCentral()` so Gradle resolves the local artifact first.
+
+---
+
+### Publish to GitHub Packages
+
+GitHub Packages is used as the primary shared artifact registry. Publishing requires a GitHub personal access token with `write:packages` scope, provided as environment variables.
+
+**1. Export credentials:**
+```bash
+export GITHUB_ACTOR=<your-github-username>
+export GITHUB_TOKEN=<your-github-token>
+```
+
+**2. Publish all packages:**
+```bash
+./gradlew publishMavenJavaPublicationToGitHubPackagesRepository
+```
+
+**3. Publish a single package:**
+```bash
+./gradlew :streamix-observability:publishMavenJavaPublicationToGitHubPackagesRepository
+./gradlew :streamix-web-commons:publishMavenJavaPublicationToGitHubPackagesRepository
+```
+
+> The `GitHubPackages` repository is only registered when both `GITHUB_ACTOR` and `GITHUB_TOKEN` are present in the environment (or `.env` file).
+
+**To consume from GitHub Packages in a microservice**, add the repository to that service's `build.gradle`:
+
+```groovy
+repositories {
+    maven {
+        url = uri('https://maven.pkg.github.com/mzilin/streamix-platform-libs')
+        credentials {
+            username = System.getenv("GITHUB_ACTOR") ?: ""
+            password = System.getenv("GITHUB_TOKEN") ?: ""
+        }
+    }
+    mavenCentral()
+}
+```
 
 ---
 

@@ -9,18 +9,11 @@ on:
       - '**/*.txt'
       - 'docs/**'
       - '.github/**'
-  pull_request:
-    branches: [main]
-    paths-ignore:
-      - 'iac/**'
-      - '**/*.md'
-      - '**/*.txt'
-      - 'docs/**'
-      - '.github/**'
   workflow_dispatch:
 
 permissions:
   contents: read
+  packages: read
 
 jobs:
   upload-coverage:
@@ -40,12 +33,11 @@ jobs:
           cache: 'gradle'
 
       - name: Run tests and generate coverage
-        run: ./gradlew test jacocoTestReport --no-daemon
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: SPRING_PROFILES_ACTIVE=ci ./gradlew test jacocoTestReport --no-daemon
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: |
-            streamix-observability/build/reports/jacoco/test/jacocoTestReport.xml
-            streamix-web-commons/build/reports/jacoco/test/jacocoTestReport.xml

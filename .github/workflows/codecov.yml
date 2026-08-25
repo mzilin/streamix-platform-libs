@@ -13,7 +13,6 @@ on:
 
 permissions:
   contents: read
-  packages: read
 
 jobs:
   upload-coverage:
@@ -33,9 +32,7 @@ jobs:
           cache: 'gradle'
 
       - name: Run tests and generate coverage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: SPRING_PROFILES_ACTIVE=ci ./gradlew test jacocoTestReport --no-daemon
+        run: ./gradlew test jacocoTestReport --no-daemon
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

@@ -23,5 +23,4 @@ public class FieldErrorResponse extends ErrorResponse {
         super("Invalid input data. Please correct the errors and try again.", status, error);
         this.fieldErrors = fieldErrors;
     }
-
 }

@@ -31,5 +31,4 @@ public class ErrorResponse {
         this.error = error;
         this.timestamp = ZonedDateTime.now();
     }
-
 }

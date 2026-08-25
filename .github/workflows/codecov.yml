@@ -9,14 +9,6 @@ on:
       - '**/*.txt'
       - 'docs/**'
       - '.github/**'
-  pull_request:
-    branches: [main]
-    paths-ignore:
-      - 'iac/**'
-      - '**/*.md'
-      - '**/*.txt'
-      - 'docs/**'
-      - '.github/**'
   workflow_dispatch:
 
 permissions:

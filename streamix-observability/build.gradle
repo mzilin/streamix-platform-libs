@@ -7,7 +7,7 @@ dependencies {
     compileOnly 'jakarta.servlet:jakarta.servlet-api'
     compileOnly 'io.grpc:grpc-api'
     compileOnly 'org.springframework.amqp:spring-rabbit'
-    compileOnly 'org.springframework.kafka:spring-kafka'
+    compileOnly 'org.springframework.boot:spring-boot-starter-kafka'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework:spring-webmvc'

@@ -93,7 +93,7 @@ All beans are guarded with `@ConditionalOnMissingBean`. Register your own bean o
 
 ### streamix-web-commons
 
-Shared library that provides standardised HTTP error response DTOs and utilities for consistent error handling across all Streamix microservices.
+Shared library that provides standardised HTTP error response DTOs, validation message constants, and utilities for consistent error handling across all Streamix microservices.
 
 **Artifact:**
 ```groovy
@@ -106,7 +106,8 @@ implementation 'com.mariuszilinskas.streamix:streamix-web-commons'
 |------------------------|----------------------------------------------------------------------------------|
 | `ErrorResponse`        | Standard HTTP error payload: `timestamp`, `status`, `error`, `message`           |
 | `FieldErrorResponse`   | Extends `ErrorResponse` with a `fieldErrors` map for per-field validation errors |
-| `WebCommonsUtils`      | Holds the shared `TIMESTAMP_FORMAT` constant (`"yyyy-MM-dd hh:mm:ss"`)           |
+| `ResponseConstants`    | Holds the shared `TIMESTAMP_FORMAT` constant (`"yyyy-MM-dd hh:mm:ss"`)           |
+| `ValidationMessages`   | Shared validation message constants (blank, null, email, password rules, etc.)   |
 
 #### Usage
 
@@ -117,15 +118,15 @@ Use `ErrorResponse` and `FieldErrorResponse` in global exception handlers (`@Res
 public ResponseEntity<ErrorResponse> handleNotFound(
         ResourceNotFoundException ex
 ) {
-  var body = new ErrorResponse(
-          HttpStatus.NOT_FOUND.value(),
-          "Not Found",
-          ex.getMessage()
-  );
+    var body = new ErrorResponse(
+            ex.getMessage(),
+            HttpStatus.NOT_FOUND.value(),
+            "Not Found"
+    );
 
-  return ResponseEntity
-          .status(HttpStatus.NOT_FOUND)
-          .body(body);
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(body);
 }
 ```
 
@@ -145,15 +146,30 @@ public ResponseEntity<FieldErrorResponse> handleValidation(
             ));
 
     var body = new FieldErrorResponse(
+            fieldErrors,
             HttpStatus.BAD_REQUEST.value(),
-            "Bad Request",
-            fieldErrors
+            "Bad Request"
     );
-    
+
     return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(body);
 }
+```
+
+Use `ValidationMessages` constants in Bean Validation annotations to keep error messages consistent across services:
+
+```java
+@NotBlank(message = ValidationMessages.CANNOT_BE_BLANK)
+@Email(message = ValidationMessages.INVALID_EMAIL)
+private String email;
+
+@Size(min = 8, max = 64, message = ValidationMessages.PASSWORD_INCORRECT_LENGTH)
+@Pattern(regexp = ".*[a-z].*", message = ValidationMessages.PASSWORD_MISSING_LOWERCASE)
+@Pattern(regexp = ".*[A-Z].*", message = ValidationMessages.PASSWORD_MISSING_UPPERCASE)
+@Pattern(regexp = ".*\\d.*",   message = ValidationMessages.PASSWORD_MISSING_DIGIT)
+@Pattern(regexp = ".*[^a-zA-Z0-9].*", message = ValidationMessages.PASSWORD_MISSING_SPECIAL)
+private String password;
 ```
 
 

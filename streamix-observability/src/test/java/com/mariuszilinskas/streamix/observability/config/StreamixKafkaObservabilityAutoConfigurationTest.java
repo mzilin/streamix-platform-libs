@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.config;
 
-import com.mariuszilinskas.streamix.observability.kafka.StreamixKafkaConsumerInterceptor;
+import com.mariuszilinskas.streamix.observability.kafka.KafkaConsumerInterceptor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -16,14 +16,14 @@ class StreamixKafkaObservabilityAutoConfigurationTest {
     @Test
     void registersConsumerInterceptor() {
         contextRunner.run(context ->
-                assertThat(context).hasSingleBean(StreamixKafkaConsumerInterceptor.class)
+                assertThat(context).hasSingleBean(KafkaConsumerInterceptor.class)
         );
     }
 
     @Test
     void doesNotRegisterConsumerInterceptorWhenUserProvidesOne() {
         contextRunner
-                .withBean(StreamixKafkaConsumerInterceptor.class, () -> new StreamixKafkaConsumerInterceptor("svc", "test"))
-                .run(context -> assertThat(context).hasSingleBean(StreamixKafkaConsumerInterceptor.class));
+                .withBean(KafkaConsumerInterceptor.class, () -> new KafkaConsumerInterceptor("svc", "test"))
+                .run(context -> assertThat(context).hasSingleBean(KafkaConsumerInterceptor.class));
     }
 }

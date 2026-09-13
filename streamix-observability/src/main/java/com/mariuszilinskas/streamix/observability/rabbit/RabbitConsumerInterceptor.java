@@ -11,12 +11,12 @@ import org.springframework.amqp.core.Message;
 
 import java.util.Map;
 
-public final class StreamixRabbitConsumerInterceptor implements MethodInterceptor {
+public final class RabbitConsumerInterceptor implements MethodInterceptor {
 
     private final String serviceName;
     private final String environment;
 
-    public StreamixRabbitConsumerInterceptor(String serviceName, String environment) {
+    public RabbitConsumerInterceptor(String serviceName, String environment) {
         this.serviceName = serviceName;
         this.environment = environment;
     }

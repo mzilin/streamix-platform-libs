@@ -1,7 +1,7 @@
 package com.mariuszilinskas.streamix.observability.config;
 
 import com.mariuszilinskas.streamix.observability.context.LogContext;
-import com.mariuszilinskas.streamix.observability.filter.StreamixLoggingFilter;
+import com.mariuszilinskas.streamix.observability.filter.LoggingFilter;
 import jakarta.servlet.FilterChain;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class StreamixObservabilityAutoConfigurationTest {
     @Test
     void registersLoggingFilter() {
         contextRunner.run(context -> {
-            assertThat(context).hasSingleBean(StreamixLoggingFilter.class);
+            assertThat(context).hasSingleBean(LoggingFilter.class);
             assertThat(context).hasSingleBean(FilterRegistrationBean.class);
 
             FilterRegistrationBean<?> registration = context.getBean(FilterRegistrationBean.class);
@@ -40,9 +40,9 @@ class StreamixObservabilityAutoConfigurationTest {
     @Test
     void doesNotRegisterFilterWhenUserProvidesOne() {
         contextRunner
-                .withBean(StreamixLoggingFilter.class, () -> new StreamixLoggingFilter("svc", "test"))
+                .withBean(LoggingFilter.class, () -> new LoggingFilter("svc", "test"))
                 .run(context -> {
-                    assertThat(context).hasSingleBean(StreamixLoggingFilter.class);
+                    assertThat(context).hasSingleBean(LoggingFilter.class);
                     assertThat(context).doesNotHaveBean(FilterRegistrationBean.class);
                 });
     }
@@ -52,7 +52,7 @@ class StreamixObservabilityAutoConfigurationTest {
         contextRunner
                 .withPropertyValues("spring.application.name=users-service", "spring.profiles.active=dev")
                 .run(context -> {
-                    StreamixLoggingFilter filter = context.getBean(StreamixLoggingFilter.class);
+                    LoggingFilter filter = context.getBean(LoggingFilter.class);
                     MockHttpServletRequest request = new MockHttpServletRequest();
                     MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -66,7 +66,7 @@ class StreamixObservabilityAutoConfigurationTest {
     @Test
     void filterSetsCorrelationIdAndUserIdDuringRequest() throws Exception {
         contextRunner.run(context -> {
-            StreamixLoggingFilter filter = context.getBean(StreamixLoggingFilter.class);
+            LoggingFilter filter = context.getBean(LoggingFilter.class);
             MockHttpServletRequest request = new MockHttpServletRequest();
             request.addHeader(LogContext.CORRELATION_HEADER, "a1b2c3d4-e5f6-7890-abcd-ef1234567890");
             request.addHeader(LogContext.USER_ID_HEADER, "user-1");
@@ -82,7 +82,7 @@ class StreamixObservabilityAutoConfigurationTest {
     @Test
     void filterClearsMdcAfterRequest() throws Exception {
         contextRunner.run(context -> {
-            StreamixLoggingFilter filter = context.getBean(StreamixLoggingFilter.class);
+            LoggingFilter filter = context.getBean(LoggingFilter.class);
             MockHttpServletRequest request = new MockHttpServletRequest();
             MockHttpServletResponse response = new MockHttpServletResponse();
 

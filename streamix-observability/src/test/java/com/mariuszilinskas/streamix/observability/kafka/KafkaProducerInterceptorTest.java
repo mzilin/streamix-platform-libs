@@ -11,9 +11,9 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class StreamixKafkaProducerInterceptorTest {
+class KafkaProducerInterceptorTest {
 
-    private final StreamixKafkaProducerInterceptor interceptor = new StreamixKafkaProducerInterceptor();
+    private final KafkaProducerInterceptor interceptor = new KafkaProducerInterceptor();
 
     @AfterEach
     void tearDown() {

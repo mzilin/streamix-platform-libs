@@ -15,12 +15,12 @@ import java.util.Map;
 
 import static com.mariuszilinskas.streamix.observability.grpc.GrpcMetadataKeys.*;
 
-public final class StreamixGrpcServerInterceptor implements ServerInterceptor {
+public final class GrpcServerInterceptor implements ServerInterceptor {
 
     private final String serviceName;
     private final String environment;
 
-    public StreamixGrpcServerInterceptor(String serviceName, String environment) {
+    public GrpcServerInterceptor(String serviceName, String environment) {
         this.serviceName = serviceName;
         this.environment = environment;
     }

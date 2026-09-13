@@ -1,7 +1,7 @@
 package com.mariuszilinskas.streamix.observability.config;
 
-import com.mariuszilinskas.streamix.observability.grpc.StreamixGrpcClientInterceptor;
-import com.mariuszilinskas.streamix.observability.grpc.StreamixGrpcServerInterceptor;
+import com.mariuszilinskas.streamix.observability.grpc.GrpcClientInterceptor;
+import com.mariuszilinskas.streamix.observability.grpc.GrpcServerInterceptor;
 import io.grpc.ServerInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -15,15 +15,15 @@ public class StreamixGrpcObservabilityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public StreamixGrpcServerInterceptor streamixGrpcServerInterceptor(Environment env) {
+    public GrpcServerInterceptor grpcServerInterceptor(Environment env) {
         String serviceName = env.getProperty("spring.application.name", "");
         String environment = String.join(",", env.getActiveProfiles());
-        return new StreamixGrpcServerInterceptor(serviceName, environment);
+        return new GrpcServerInterceptor(serviceName, environment);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public StreamixGrpcClientInterceptor streamixGrpcClientInterceptor() {
-        return new StreamixGrpcClientInterceptor();
+    public GrpcClientInterceptor grpcClientInterceptor() {
+        return new GrpcClientInterceptor();
     }
 }

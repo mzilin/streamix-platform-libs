@@ -13,14 +13,14 @@ import org.springframework.kafka.listener.RecordInterceptor;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public final class StreamixKafkaConsumerInterceptor implements RecordInterceptor<Object, Object> {
+public final class KafkaConsumerInterceptor implements RecordInterceptor<Object, Object> {
 
     private final ThreadLocal<Map<String, String>> previousContextHolder = new ThreadLocal<>();
 
     private final String serviceName;
     private final String environment;
 
-    public StreamixKafkaConsumerInterceptor(String serviceName, String environment) {
+    public KafkaConsumerInterceptor(String serviceName, String environment) {
         this.serviceName = serviceName;
         this.environment = environment;
     }

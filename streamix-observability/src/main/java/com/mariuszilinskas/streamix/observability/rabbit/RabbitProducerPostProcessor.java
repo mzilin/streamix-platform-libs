@@ -7,7 +7,7 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 
-public final class StreamixRabbitProducerPostProcessor implements MessagePostProcessor {
+public final class RabbitProducerPostProcessor implements MessagePostProcessor {
 
     @Override
     @NonNull

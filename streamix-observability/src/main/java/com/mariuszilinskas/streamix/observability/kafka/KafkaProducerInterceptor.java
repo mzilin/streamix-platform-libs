@@ -9,7 +9,7 @@ import org.slf4j.MDC;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public final class StreamixKafkaProducerInterceptor implements ProducerInterceptor<Object, Object> {
+public final class KafkaProducerInterceptor implements ProducerInterceptor<Object, Object> {
 
     @Override
     @NonNull

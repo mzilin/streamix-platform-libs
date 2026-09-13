@@ -9,9 +9,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class StreamixMdcTaskDecoratorTest {
+class MdcTaskDecoratorTest {
 
-    private final StreamixMdcTaskDecorator decorator = new StreamixMdcTaskDecorator();
+    private final MdcTaskDecorator decorator = new MdcTaskDecorator();
 
     @AfterEach
     void tearDown() {

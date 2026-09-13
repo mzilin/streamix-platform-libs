@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.config;
 
-import com.mariuszilinskas.streamix.observability.filter.StreamixLoggingFilter;
+import com.mariuszilinskas.streamix.observability.filter.LoggingFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -18,21 +18,21 @@ import org.springframework.core.env.Environment;
 public class StreamixObservabilityAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnMissingBean(StreamixLoggingFilter.class)
+    @ConditionalOnMissingBean(LoggingFilter.class)
     static class FilterConfiguration {
 
         @Bean
-        public StreamixLoggingFilter streamixLoggingFilter(Environment env) {
+        public LoggingFilter loggingFilter(Environment env) {
             String serviceName = env.getProperty("spring.application.name", "");
             String environment = String.join(",", env.getActiveProfiles());
-            return new StreamixLoggingFilter(serviceName, environment);
+            return new LoggingFilter(serviceName, environment);
         }
 
         @Bean
-        public FilterRegistrationBean<@NonNull StreamixLoggingFilter> streamixLoggingFilterRegistration(
-                StreamixLoggingFilter filter
+        public FilterRegistrationBean<@NonNull LoggingFilter> loggingFilterRegistration(
+                LoggingFilter filter
         ) {
-            FilterRegistrationBean<@NonNull StreamixLoggingFilter> registration =
+            FilterRegistrationBean<@NonNull LoggingFilter> registration =
                     new FilterRegistrationBean<>();
             registration.setFilter(filter);
             registration.setOrder(Integer.MIN_VALUE + 10);

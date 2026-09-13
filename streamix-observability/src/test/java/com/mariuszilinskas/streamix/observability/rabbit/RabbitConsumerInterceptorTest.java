@@ -18,9 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class StreamixRabbitConsumerInterceptorTest {
+class RabbitConsumerInterceptorTest {
 
-    private final StreamixRabbitConsumerInterceptor interceptor = new StreamixRabbitConsumerInterceptor("test-service", "test");
+    private final RabbitConsumerInterceptor interceptor = new RabbitConsumerInterceptor("test-service", "test");
 
     @Mock
     private MethodInvocation invocation;

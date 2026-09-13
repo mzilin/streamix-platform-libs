@@ -6,7 +6,7 @@ import org.springframework.core.task.TaskDecorator;
 
 import java.util.Map;
 
-public final class StreamixMdcTaskDecorator implements TaskDecorator {
+public final class MdcTaskDecorator implements TaskDecorator {
 
     @Override
     @NonNull

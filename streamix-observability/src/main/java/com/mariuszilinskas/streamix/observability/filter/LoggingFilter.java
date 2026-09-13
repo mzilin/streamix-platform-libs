@@ -14,12 +14,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Map;
 
-public final class StreamixLoggingFilter extends OncePerRequestFilter {
+public final class LoggingFilter extends OncePerRequestFilter {
 
     private final String serviceName;
     private final String environment;
 
-    public StreamixLoggingFilter(String serviceName, String environment) {
+    public LoggingFilter(String serviceName, String environment) {
         this.serviceName = serviceName;
         this.environment = environment;
     }

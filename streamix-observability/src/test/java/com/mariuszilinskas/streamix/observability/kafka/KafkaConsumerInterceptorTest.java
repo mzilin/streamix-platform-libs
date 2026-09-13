@@ -19,9 +19,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class StreamixKafkaConsumerInterceptorTest {
+class KafkaConsumerInterceptorTest {
 
-    private final StreamixKafkaConsumerInterceptor interceptor = new StreamixKafkaConsumerInterceptor("test-service", "test");
+    private final KafkaConsumerInterceptor interceptor = new KafkaConsumerInterceptor("test-service", "test");
 
     @Mock
     private Consumer<Object, Object> consumer;

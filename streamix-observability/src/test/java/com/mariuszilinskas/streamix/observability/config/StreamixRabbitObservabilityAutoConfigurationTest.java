@@ -1,7 +1,7 @@
 package com.mariuszilinskas.streamix.observability.config;
 
-import com.mariuszilinskas.streamix.observability.rabbit.StreamixRabbitConsumerInterceptor;
-import com.mariuszilinskas.streamix.observability.rabbit.StreamixRabbitProducerPostProcessor;
+import com.mariuszilinskas.streamix.observability.rabbit.RabbitConsumerInterceptor;
+import com.mariuszilinskas.streamix.observability.rabbit.RabbitProducerPostProcessor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -17,22 +17,22 @@ class StreamixRabbitObservabilityAutoConfigurationTest {
     @Test
     void registersBothBeans() {
         contextRunner.run(context -> {
-            assertThat(context).hasSingleBean(StreamixRabbitConsumerInterceptor.class);
-            assertThat(context).hasSingleBean(StreamixRabbitProducerPostProcessor.class);
+            assertThat(context).hasSingleBean(RabbitConsumerInterceptor.class);
+            assertThat(context).hasSingleBean(RabbitProducerPostProcessor.class);
         });
     }
 
     @Test
     void doesNotRegisterConsumerInterceptorWhenUserProvidesOne() {
         contextRunner
-                .withBean(StreamixRabbitConsumerInterceptor.class, () -> new StreamixRabbitConsumerInterceptor("svc", "test"))
-                .run(context -> assertThat(context).hasSingleBean(StreamixRabbitConsumerInterceptor.class));
+                .withBean(RabbitConsumerInterceptor.class, () -> new RabbitConsumerInterceptor("svc", "test"))
+                .run(context -> assertThat(context).hasSingleBean(RabbitConsumerInterceptor.class));
     }
 
     @Test
     void doesNotRegisterProducerPostProcessorWhenUserProvidesOne() {
         contextRunner
-                .withBean(StreamixRabbitProducerPostProcessor.class, StreamixRabbitProducerPostProcessor::new)
-                .run(context -> assertThat(context).hasSingleBean(StreamixRabbitProducerPostProcessor.class));
+                .withBean(RabbitProducerPostProcessor.class, RabbitProducerPostProcessor::new)
+                .run(context -> assertThat(context).hasSingleBean(RabbitProducerPostProcessor.class));
     }
 }

@@ -11,7 +11,7 @@ import org.slf4j.MDC;
 
 import static com.mariuszilinskas.streamix.observability.grpc.GrpcMetadataKeys.*;
 
-public final class StreamixGrpcClientInterceptor implements ClientInterceptor {
+public final class GrpcClientInterceptor implements ClientInterceptor {
 
     @Override
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(

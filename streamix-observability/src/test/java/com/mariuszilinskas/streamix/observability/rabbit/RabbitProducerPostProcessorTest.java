@@ -9,9 +9,9 @@ import org.springframework.amqp.core.MessageProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class StreamixRabbitProducerPostProcessorTest {
+class RabbitProducerPostProcessorTest {
 
-    private final StreamixRabbitProducerPostProcessor postProcessor = new StreamixRabbitProducerPostProcessor();
+    private final RabbitProducerPostProcessor postProcessor = new RabbitProducerPostProcessor();
 
     @AfterEach
     void tearDown() {

@@ -13,9 +13,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class StreamixLoggingFilterTest {
+class LoggingFilterTest {
 
-    private final StreamixLoggingFilter filter = new StreamixLoggingFilter("my-service", "test");
+    private final LoggingFilter filter = new LoggingFilter("my-service", "test");
 
     @AfterEach
     void tearDown() {

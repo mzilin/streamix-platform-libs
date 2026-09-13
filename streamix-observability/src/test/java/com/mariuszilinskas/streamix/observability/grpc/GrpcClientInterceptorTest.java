@@ -21,9 +21,9 @@ import static org.mockito.Mockito.when;
 import static com.mariuszilinskas.streamix.observability.grpc.GrpcMetadataKeys.*;
 
 @ExtendWith(MockitoExtension.class)
-class StreamixGrpcClientInterceptorTest {
+class GrpcClientInterceptorTest {
 
-    private final StreamixGrpcClientInterceptor interceptor = new StreamixGrpcClientInterceptor();
+    private final GrpcClientInterceptor interceptor = new GrpcClientInterceptor();
 
     @Mock
     private Channel channel;

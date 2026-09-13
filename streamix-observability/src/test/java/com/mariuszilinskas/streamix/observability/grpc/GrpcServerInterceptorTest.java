@@ -21,9 +21,9 @@ import static org.mockito.Mockito.when;
 import static com.mariuszilinskas.streamix.observability.grpc.GrpcMetadataKeys.*;
 
 @ExtendWith(MockitoExtension.class)
-class StreamixGrpcServerInterceptorTest {
+class GrpcServerInterceptorTest {
 
-    private final StreamixGrpcServerInterceptor interceptor = new StreamixGrpcServerInterceptor("test-service", "test");
+    private final GrpcServerInterceptor interceptor = new GrpcServerInterceptor("test-service", "test");
 
     @Mock
     private ServerCall<Object, Object> serverCall;

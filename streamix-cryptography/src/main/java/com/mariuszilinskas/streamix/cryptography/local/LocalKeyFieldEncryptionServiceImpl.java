@@ -59,28 +59,28 @@ public final class LocalKeyFieldEncryptionServiceImpl implements FieldEncryption
     }
 
     @Override
-    public String decrypt(String encrypted) {
-        if (encrypted == null || encrypted.isBlank()) {
-            throw new IllegalArgumentException("encrypted value must not be null or blank");
+    public String decrypt(String ciphertext) {
+        if (ciphertext == null || ciphertext.isBlank()) {
+            throw new IllegalArgumentException("ciphertext must not be null or blank");
         }
 
         try {
-            byte[] combined = Base64.getDecoder().decode(encrypted);
+            byte[] combined = Base64.getDecoder().decode(ciphertext);
 
             if (combined.length <= IV_LENGTH_BYTES) {
-                throw new IllegalArgumentException("Invalid encrypted value");
+                throw new CryptographyException("Invalid encrypted value");
             }
 
             byte[] iv = new byte[IV_LENGTH_BYTES];
-            byte[] ciphertext = new byte[combined.length - IV_LENGTH_BYTES];
+            byte[] ciphertextBytes = new byte[combined.length - IV_LENGTH_BYTES];
 
             System.arraycopy(combined, 0, iv, 0, IV_LENGTH_BYTES);
             System.arraycopy(
                     combined,
                     IV_LENGTH_BYTES,
-                    ciphertext,
+                    ciphertextBytes,
                     0,
-                    ciphertext.length
+                    ciphertextBytes.length
             );
 
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -91,12 +91,12 @@ public final class LocalKeyFieldEncryptionServiceImpl implements FieldEncryption
             );
 
             return new String(
-                    cipher.doFinal(ciphertext),
+                    cipher.doFinal(ciphertextBytes),
                     StandardCharsets.UTF_8
             );
 
         } catch (IllegalArgumentException e) {
-            throw new CryptographyException("Invalid encrypted value", e);
+            throw new CryptographyException("Invalid Base64 ciphertext", e);
         } catch (GeneralSecurityException e) {
             throw new CryptographyException("AES-GCM decryption failed", e);
         }

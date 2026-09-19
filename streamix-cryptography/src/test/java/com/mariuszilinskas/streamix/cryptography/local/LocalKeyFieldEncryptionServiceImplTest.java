@@ -36,7 +36,7 @@ class LocalKeyFieldEncryptionServiceImplTest {
     void decrypt_withInvalidBase64_throwsCryptographyException() {
         assertThatThrownBy(() -> service.decrypt("not-valid-base64!!!"))
                 .isInstanceOf(CryptographyException.class)
-                .hasMessage("Invalid encrypted value");
+                .hasMessage("Invalid Base64 ciphertext");
     }
 
     @Test

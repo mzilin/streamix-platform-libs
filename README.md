@@ -2,7 +2,7 @@
 
 ![Build](https://img.shields.io/github/actions/workflow/status/mzilin/streamix-platform-libs/build.yml?label=Build&logo=github&logoColor=white&style=flat)
 ![Coverage](https://img.shields.io/codecov/c/github/mzilin/streamix-platform-libs?label=Coverage&logo=codecov&logoColor=white&style=flat)
-![Status](https://img.shields.io/badge/status-in_progress-yellow?label=Status)
+![Status](https://img.shields.io/badge/status-complete-brightgreen?label=Status)
 
 
 This repository contains shared Java libraries used across all **Streamix** (Video Streaming Platform) microservices. Each library is published as a standalone Maven artifact to Maven Local (for local development), GitHub Packages, or AWS CodeArtifact (for CI/CD and shared environments).
@@ -15,6 +15,8 @@ For a complete system overview and links to all microservices, please refer to t
 * [Introduction](#introduction)
 * [Technology Stack](#technology-stack)
 * [Packages](#packages)
+  * [streamix-cryptography](#streamix-cryptography)
+  * [streamix-data-masking](#streamix-data-masking)
   * [streamix-observability](#streamix-observability)
   * [streamix-web-commons](#streamix-web-commons)
 * [Publishing Packages](#publishing-packages)
@@ -44,6 +46,126 @@ Each library is independently usable — services only include the modules they 
 
 
 ## Packages
+
+### streamix-cryptography
+
+Shared library that provides AES-GCM field-level encryption for sensitive data stored in databases, with support for a local symmetric key or AWS KMS as the key provider.
+
+**Artifact:**
+```groovy
+implementation 'com.mariuszilinskas.streamix:streamix-cryptography'
+```
+
+No `@EnableXxx` annotation is required. The correct implementation is registered automatically based on the `cryptography.provider` property.
+
+#### What activates automatically
+
+| `cryptography.provider` | Implementation registered                                     |
+|-------------------------|---------------------------------------------------------------|
+| `local`                 | `LocalKeyFieldEncryptionServiceImpl` — AES/GCM with a local Base64-encoded key |
+| `kms`                   | `KmsFieldEncryptionServiceImpl` — delegates encrypt/decrypt to AWS KMS          |
+
+#### Configuration
+
+**Local provider** (`application.yml`):
+```yaml
+cryptography:
+  provider: local
+  encryption-key: <base64-encoded-key>   # 128, 192, or 256-bit AES key
+```
+
+**KMS provider** (`application.yml`):
+```yaml
+cryptography:
+  provider: kms
+  kms-key-id: <aws-kms-key-id>
+  aws-region: <aws-region>
+```
+
+#### Usage
+
+Inject `FieldEncryptionService` and call `encrypt` / `decrypt`:
+
+```java
+@Service
+public class UserService {
+
+    private final FieldEncryptionService encryption;
+
+    public UserService(FieldEncryptionService encryption) {
+        this.encryption = encryption;
+    }
+
+    public void saveUser(User user) {
+        user.setEmail(encryption.encrypt(user.getEmail()));
+        userRepository.save(user);
+    }
+
+    public String getEmail(User user) {
+        return encryption.decrypt(user.getEmail());
+    }
+}
+```
+
+#### Overriding a bean
+
+All beans are guarded with `@ConditionalOnMissingBean`. Register your own `FieldEncryptionService` bean to disable the default and provide a custom implementation.
+
+---
+
+### streamix-data-masking
+
+Shared library that provides PII-safe masking for use in logs and audit trails. Exposes a single `MaskingService` bean with well-defined masking strategies, and a `Loggable` interface that lets DTOs define their own safe log representation.
+
+**Artifact:**
+```groovy
+implementation 'com.mariuszilinskas.streamix:streamix-data-masking'
+```
+
+No `@EnableXxx` annotation is required. `MaskingService` is registered automatically on startup.
+
+#### Masking strategies
+
+| Strategy  | Rule                                                        | Example                                     |
+|-----------|-------------------------------------------------------------|---------------------------------------------|
+| `FULL`    | Replace every character with `*`                            | `hello` → `*****`                           |
+| `PARTIAL` | Keep first and last character, mask the middle              | `hello` → `h***o`; `he` → `h*`             |
+| `EMAIL`   | Per dot-delimited segment: keep first char, mask the rest   | `lmarie.ali@gmail.com` → `l*****.a**@g****.c**` |
+
+#### Usage
+
+Inject `MaskingService` and call the appropriate method directly:
+
+```java
+log.info("Registering user: {}", maskingService.maskEmail(email));
+log.info("Card: {}", maskingService.maskPartial(cardNumber));
+```
+
+Or implement `Loggable` on a DTO to encapsulate the masking logic:
+
+```java
+public record CreateUserRequest(String email, String phone) implements Loggable {
+
+    @Override
+    public Object getLoggable() {
+        return new Log(
+                Masking.maskEmail(email),
+                Masking.maskPartial(phone)
+        );
+    }
+
+    private record Log(String email, String phone) {}
+}
+
+// in a service:
+log.info("Received: {}", request.getLoggable());
+```
+
+#### Overriding a bean
+
+The default `MaskingServiceImpl` bean is guarded with `@ConditionalOnMissingBean`. Register your own `MaskingService` bean to replace it.
+
+---
 
 ### streamix-observability
 
@@ -172,7 +294,6 @@ private String email;
 private String password;
 ```
 
-
 ## Publishing Packages
 
 All packages share the version defined in the root `build.gradle`:
@@ -181,7 +302,7 @@ All packages share the version defined in the root `build.gradle`:
 version = '1.0.1'
 ```
 
-Both libraries are published together when running from the repository root, or individually by targeting a specific subproject.
+All packages are published together when running from the repository root, or individually by targeting a specific subproject.
 
 ---
 
@@ -196,6 +317,8 @@ Maven Local publishes artifacts to `~/.m2/repository/` on your machine. It is us
 
 **Publish a single package:**
 ```bash
+./gradlew :streamix-cryptography:publishToMavenLocal
+./gradlew :streamix-data-masking:publishToMavenLocal
 ./gradlew :streamix-observability:publishToMavenLocal
 ./gradlew :streamix-web-commons:publishToMavenLocal
 ```
@@ -230,6 +353,8 @@ export GITHUB_TOKEN=<your-github-token>
 
 **3. Publish a single package:**
 ```bash
+./gradlew :streamix-cryptography:publishMavenJavaPublicationToGitHubPackagesRepository
+./gradlew :streamix-data-masking:publishMavenJavaPublicationToGitHubPackagesRepository
 ./gradlew :streamix-observability:publishMavenJavaPublicationToGitHubPackagesRepository
 ./gradlew :streamix-web-commons:publishMavenJavaPublicationToGitHubPackagesRepository
 ```
@@ -274,6 +399,8 @@ export CODE_ARTIFACT_TOKEN=$(aws codeartifact get-authorization-token \
 
 **3. Publish a single package:**
 ```bash
+./gradlew :streamix-cryptography:publish
+./gradlew :streamix-data-masking:publish
 ./gradlew :streamix-observability:publish
 ./gradlew :streamix-web-commons:publish
 ```
@@ -307,6 +434,8 @@ Each subproject has its own test suite. To run all tests:
 To run tests for a specific package:
 
 ```bash
+./gradlew :streamix-cryptography:test
+./gradlew :streamix-data-masking:test
 ./gradlew :streamix-observability:test
 ./gradlew :streamix-web-commons:test
 ```

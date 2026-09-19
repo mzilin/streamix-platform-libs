@@ -1,5 +1,6 @@
 rootProject.name = 'streamix-platform-libs'
 
 include 'streamix-cryptography'
+include 'streamix-data-masking'
 include 'streamix-observability'
 include 'streamix-web-commons'

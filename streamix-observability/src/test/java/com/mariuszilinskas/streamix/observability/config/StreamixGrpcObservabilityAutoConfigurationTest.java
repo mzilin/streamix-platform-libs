@@ -1,7 +1,7 @@
 package com.mariuszilinskas.streamix.observability.config;
 
-import com.mariuszilinskas.streamix.observability.grpc.StreamixGrpcClientInterceptor;
-import com.mariuszilinskas.streamix.observability.grpc.StreamixGrpcServerInterceptor;
+import com.mariuszilinskas.streamix.observability.grpc.GrpcClientInterceptor;
+import com.mariuszilinskas.streamix.observability.grpc.GrpcServerInterceptor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -17,22 +17,22 @@ class StreamixGrpcObservabilityAutoConfigurationTest {
     @Test
     void registersBothInterceptors() {
         contextRunner.run(context -> {
-            assertThat(context).hasSingleBean(StreamixGrpcServerInterceptor.class);
-            assertThat(context).hasSingleBean(StreamixGrpcClientInterceptor.class);
+            assertThat(context).hasSingleBean(GrpcServerInterceptor.class);
+            assertThat(context).hasSingleBean(GrpcClientInterceptor.class);
         });
     }
 
     @Test
     void doesNotRegisterServerInterceptorWhenUserProvidesOne() {
         contextRunner
-                .withBean(StreamixGrpcServerInterceptor.class, () -> new StreamixGrpcServerInterceptor("svc", "test"))
-                .run(context -> assertThat(context).hasSingleBean(StreamixGrpcServerInterceptor.class));
+                .withBean(GrpcServerInterceptor.class, () -> new GrpcServerInterceptor("svc", "test"))
+                .run(context -> assertThat(context).hasSingleBean(GrpcServerInterceptor.class));
     }
 
     @Test
     void doesNotRegisterClientInterceptorWhenUserProvidesOne() {
         contextRunner
-                .withBean(StreamixGrpcClientInterceptor.class, StreamixGrpcClientInterceptor::new)
-                .run(context -> assertThat(context).hasSingleBean(StreamixGrpcClientInterceptor.class));
+                .withBean(GrpcClientInterceptor.class, GrpcClientInterceptor::new)
+                .run(context -> assertThat(context).hasSingleBean(GrpcClientInterceptor.class));
     }
 }

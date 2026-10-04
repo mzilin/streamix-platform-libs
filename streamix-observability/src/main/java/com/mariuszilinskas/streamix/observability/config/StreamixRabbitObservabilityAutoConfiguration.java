@@ -1,7 +1,7 @@
 package com.mariuszilinskas.streamix.observability.config;
 
-import com.mariuszilinskas.streamix.observability.rabbit.StreamixRabbitConsumerInterceptor;
-import com.mariuszilinskas.streamix.observability.rabbit.StreamixRabbitProducerPostProcessor;
+import com.mariuszilinskas.streamix.observability.rabbit.RabbitConsumerInterceptor;
+import com.mariuszilinskas.streamix.observability.rabbit.RabbitProducerPostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -17,23 +17,23 @@ public class StreamixRabbitObservabilityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public StreamixRabbitConsumerInterceptor streamixRabbitConsumerInterceptor(Environment env) {
+    public RabbitConsumerInterceptor rabbitConsumerInterceptor(Environment env) {
         String serviceName = env.getProperty("spring.application.name", "");
         String environment = String.join(",", env.getActiveProfiles());
-        return new StreamixRabbitConsumerInterceptor(serviceName, environment);
+        return new RabbitConsumerInterceptor(serviceName, environment);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public StreamixRabbitProducerPostProcessor streamixRabbitProducerPostProcessor() {
-        return new StreamixRabbitProducerPostProcessor();
+    public RabbitProducerPostProcessor rabbitProducerPostProcessor() {
+        return new RabbitProducerPostProcessor();
     }
 
     @Bean
     @ConditionalOnBean(RabbitTemplate.class)
-    public SmartInitializingSingleton streamixRabbitProducerPostProcessorRegistrar(
+    public SmartInitializingSingleton rabbitProducerPostProcessorRegistrar(
             RabbitTemplate rabbitTemplate,
-            StreamixRabbitProducerPostProcessor postProcessor
+            RabbitProducerPostProcessor postProcessor
     ) {
         return () -> rabbitTemplate.addBeforePublishPostProcessors(postProcessor);
     }

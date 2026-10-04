@@ -1,6 +1,6 @@
 package com.mariuszilinskas.streamix.observability.config;
 
-import com.mariuszilinskas.streamix.observability.async.StreamixMdcTaskDecorator;
+import com.mariuszilinskas.streamix.observability.async.MdcTaskDecorator;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -13,7 +13,7 @@ public class StreamixAsyncObservabilityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public StreamixMdcTaskDecorator streamixMdcTaskDecorator() {
-        return new StreamixMdcTaskDecorator();
+    public MdcTaskDecorator mdcTaskDecorator() {
+        return new MdcTaskDecorator();
     }
 }

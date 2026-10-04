@@ -1,7 +1,7 @@
 package com.mariuszilinskas.streamix.web.response.error;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.mariuszilinskas.streamix.web.response.ResponseConstants;
+import com.mariuszilinskas.streamix.web.constant.ResponseConstants;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,0 +1,80 @@
+package com.mariuszilinskas.streamix.observability.grpc;
+
+import com.mariuszilinskas.streamix.observability.context.LogContext;
+import com.mariuszilinskas.streamix.observability.context.LogContextManager;
+import io.grpc.ForwardingServerCall;
+import io.grpc.ForwardingServerCallListener;
+import io.grpc.Metadata;
+import io.grpc.ServerCall;
+import io.grpc.ServerCallHandler;
+import io.grpc.ServerInterceptor;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.MDC;
+
+import java.util.Map;
+
+import static com.mariuszilinskas.streamix.observability.grpc.GrpcMetadataKeys.*;
+
+public final class GrpcServerInterceptor implements ServerInterceptor {
+
+    private final String serviceName;
+    private final String environment;
+
+    public GrpcServerInterceptor(String serviceName, String environment) {
+        this.serviceName = serviceName;
+        this.environment = environment;
+    }
+
+    @Override
+    public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
+            ServerCall<ReqT, RespT> call,
+            Metadata inboundHeaders,
+            ServerCallHandler<ReqT, RespT> next
+    ) {
+        String correlationId = LogContextManager.resolveCorrelationId(inboundHeaders.get(CORRELATION_ID_KEY));
+        String userId = inboundHeaders.get(USER_ID_KEY);
+
+        Map<String, String> previousContext = MDC.getCopyOfContextMap();
+        LogContextManager.put(LogContext.CORRELATION_ID, correlationId);
+        LogContextManager.put(LogContext.USER_ID, userId);
+        LogContextManager.put(LogContext.SERVICE, serviceName);
+        LogContextManager.put(LogContext.ENVIRONMENT, environment);
+
+        ServerCall<ReqT, RespT> wrappedCall = new ForwardingServerCall.SimpleForwardingServerCall<>(call) {
+            @Override
+            public void sendHeaders(Metadata responseHeaders) {
+                responseHeaders.put(CORRELATION_ID_KEY, correlationId);
+                super.sendHeaders(responseHeaders);
+            }
+        };
+
+        ServerCall.Listener<ReqT> listener = next.startCall(wrappedCall, inboundHeaders);
+
+        return new ForwardingServerCallListener.SimpleForwardingServerCallListener<>(listener) {
+            @Override
+            public void onComplete() {
+                try {
+                    super.onComplete();
+                } finally {
+                    restoreContext(previousContext);
+                }
+            }
+
+            @Override
+            public void onCancel() {
+                try {
+                    super.onCancel();
+                } finally {
+                    restoreContext(previousContext);
+                }
+            }
+        };
+    }
+
+    private static void restoreContext(@Nullable Map<String, String> previousContext) {
+        MDC.clear();
+        if (previousContext != null) {
+            MDC.setContextMap(previousContext);
+        }
+    }
+}

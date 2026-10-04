@@ -1,7 +1,7 @@
 package com.mariuszilinskas.streamix.observability.config;
 
-import com.mariuszilinskas.streamix.observability.kafka.StreamixKafkaConsumerInterceptor;
-import com.mariuszilinskas.streamix.observability.kafka.StreamixKafkaProducerInterceptor;
+import com.mariuszilinskas.streamix.observability.kafka.KafkaConsumerInterceptor;
+import com.mariuszilinskas.streamix.observability.kafka.KafkaProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -22,22 +22,22 @@ public class StreamixKafkaObservabilityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public StreamixKafkaConsumerInterceptor streamixKafkaConsumerInterceptor(Environment env) {
+    public KafkaConsumerInterceptor kafkaConsumerInterceptor(Environment env) {
         String serviceName = env.getProperty("spring.application.name", "");
         String environment = String.join(",", env.getActiveProfiles());
-        return new StreamixKafkaConsumerInterceptor(serviceName, environment);
+        return new KafkaConsumerInterceptor(serviceName, environment);
     }
 
     @Bean
     @ConditionalOnBean(DefaultKafkaProducerFactory.class)
-    @ConditionalOnMissingBean(name = "streamixKafkaProducerInterceptorRegistrar")
-    public SmartInitializingSingleton streamixKafkaProducerInterceptorRegistrar(
+    @ConditionalOnMissingBean(name = "kafkaProducerInterceptorRegistrar")
+    public SmartInitializingSingleton kafkaProducerInterceptorRegistrar(
             DefaultKafkaProducerFactory<?, ?> producerFactory
     ) {
         return () -> {
             Map<String, Object> configs = new HashMap<>(producerFactory.getConfigurationProperties());
             String existing = (String) configs.getOrDefault(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, "");
-            String className = StreamixKafkaProducerInterceptor.class.getName();
+            String className = KafkaProducerInterceptor.class.getName();
             if (!existing.contains(className)) {
                 configs.put(
                         ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
